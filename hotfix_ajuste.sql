@@ -1,0 +1,1 @@
+-- Ajuste menor en producción para probar el caso donde el pipeline verificar-codigo-actualizado no pasa
