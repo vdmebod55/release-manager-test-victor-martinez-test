@@ -1,0 +1,46 @@
+name: Validación de Pull Request
+
+on:
+    pull_request:
+        branches:
+            - develop
+            - main
+
+jobs:
+    validate:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
+
+            - name: Validar convención de nombre de rama
+              run: |
+                RAMA="${{ github.head_ref }}"
+                echo "Rama origen: $RAMA"
+                if echo "$RAMA" | grep -qE '^(feature|hotfix|release)/'; then
+                    echo "OK: Nombre de la rama sigue la convención definida"
+                else
+                    echo "ERROR: La rama debe iniciar con feature/, hotfix/ o release/"
+                    exit 1
+                fi
+
+            - name: Validar que el PR tenga descripción
+              run: |
+                BODY="${{ github.event.pull_request.body }}"
+                if [ -z "$BODY" ]; then
+                    echo "ERROR: El PR no tiene descripción"
+                    exit 1
+                else
+                    echo "OK: El PR incluye descripción"
+                fi
+
+            - name: Validar que exista CHANGELOG
+              run: |
+                if [ -f "CHANGELOG.md" ]; then
+                    echo "OK: CHANGELOG.md presente"
+                else
+                    echo "ERROR: CHANGELOG.md faltante"
+                    exit 1
+                fi
