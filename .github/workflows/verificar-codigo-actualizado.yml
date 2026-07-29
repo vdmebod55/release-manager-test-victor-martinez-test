@@ -17,7 +17,9 @@ jobs:
             - name: Verificar que la rama contiene el último main
               run: |
                 git fetch origin main
-                if git merge-base --is-ancestor origin/main HEAD; then
+                HEAD_REAL="${{ github.event.pull_request.head.sha }}"
+                echo "INFO: Comparando SHA real de la rama: $HEAD_REAL"
+                if git merge-base --is-ancestor origin/main $HEAD_REAL; then
                     echo "OK: La rama contiene el último codigo productivo"
                 else
                     echo "ERROR: La rama esta desactualizada respecto a main"
